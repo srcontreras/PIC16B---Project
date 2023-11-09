@@ -19,6 +19,9 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+# prevents from downloading too much data
+CLOSESPIDER_PAGECOUNT = 2630
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
