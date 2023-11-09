@@ -24,14 +24,15 @@ class GoodNews(scrapy.Spider):
             if page:
                 page = response.urljoin(page)
                 yield scrapy.Request(page, callback = self.parse_title_content)
-                
+        
         # to retrieve the next page, we can find the link for it and yield back.
         # we do this outside the for-loop
-        
-        next_page = response.css("div.page-nav.td-pb-padding-side > span.current + a::attr(href)").get()
+        next_page = response.css("div.page-nav a::attr(href)").getall()[-1]
         if next_page:
             yield scrapy.Request(next_page, callback = self.parse)
-            
+        
+        
+        
     # parse_title_content assumes you start at the article page  
     def parse_title_content(self, response):
         """
@@ -43,5 +44,4 @@ class GoodNews(scrapy.Spider):
         title = response.css("h1.entry-title::text").extract()
         # record content
         content = response.css("div.td-post-content > p::text").extract()
-        if content:
-            yield {"title" : title, "content" : content}
+        yield {"title" : title, "content" : content}
