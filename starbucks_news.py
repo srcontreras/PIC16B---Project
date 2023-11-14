@@ -23,7 +23,7 @@ class get_news:
         # we cannot retrieve more than 20000 articles
         # which means we can only have 800 pages, each page 25 articles.
         for i in range(1, self.iteration + 1):
-            params = urllib.parse.urlencode({"api_token": self.api_token,
+            params = parse.urlencode({"api_token": self.api_token,
                                              "search": self.company_name,
                                              "language": "en",
                                              "published_before": self.end_date,
@@ -52,7 +52,7 @@ class get_news:
 
 if __name__ == "__main__":
     api_token = "1XOrWumzd3Lw99zn156obKbYmWS9wtVw4FX4LiuS"
-    conn = http.client.HTTPSConnection('api.thenewsapi.com')
+    conn = client.HTTPSConnection('api.thenewsapi.com')
     elements = ["title", "description", "keywords", 
                 "url", "published_at", "source", "categories"]
     df = pd.DataFrame()
