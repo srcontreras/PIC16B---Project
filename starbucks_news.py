@@ -64,4 +64,4 @@ if __name__ == "__main__":
         ele = starbucks.element(raw_data, x)
         df[x] = ele
         
-    df.to_csv("Starbucks_news")
+    df.to_csv("Starbucks_news.csv")
