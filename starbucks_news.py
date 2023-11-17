@@ -116,7 +116,9 @@ class get_news:
 
 #     # if you want to do a new company, copy the code above and change some parameters.
     
-#     # if you want to simply visualize the data for starbucks, after import the data and class, do:
+#     # if you want to simply visualize the data for starbucks, do:
+#     import pandas as pd
+#     from plotly import express as px
 #     df = pd.read_csv("Starbucks_news.csv")
 #     starbucks = get_news()
 #     starbucks.understand_data(df)
