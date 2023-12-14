@@ -1,6 +1,28 @@
+import json
+import pandas as pd
+import numpy as np
+from http import client
+from urllib import parse
+from tqdm import tqdm
+from matplotlib import pyplot as plt
+from plotly import express as px
+
 class get_news:
+    '''
+    ***** IMPORTANT NOTE *****
+    The News API used is not free. Anyone who runs our project shouldn't run the methods in this class,
+    except understand_data(df), which presents plots. Instead, we have created Starbucks_news.csv dataset, 
+    which contains all the textual information we need. 
+    Direcly reading from this .csv dataframe is recommended. 
+    **************************
     
-    def __init__(self, company_name = None, end_date = None, pages = None, 
+    This class is for retrieving the news article of Starbucks from 2021-01-01 to 2023-11-14. A news API called
+    TheNewsAPI is used for data collection. Data cleaning and visualization are also implemented in this class.
+    As notified, the API is not free, so re-running is not recommended. To see how to retrieve data from this 
+    API, see the code in __main__() at the bottom.
+
+    '''
+    def __init__(self, company_name = 'Starbucks', end_date = '2023-11-14', pages = None, 
                  api_token = None, conn = None):
         
         # company_name is the company we focus on
@@ -15,7 +37,7 @@ class get_news:
     def retrieve_raw_data(self):
         news_list = []
         
-        for i in tqdm(range(1, self.pages + 1)):
+        for i in range(1, self.pages + 1):
             params = parse.urlencode({"api_token": self.api_token,
                                              "search": self.company_name,
                                              "search_fields": "description,title,keywords",
@@ -80,43 +102,41 @@ class get_news:
     
 
 if __name__ == "__main__":
-    import json
-    import pandas as pd
-    import numpy as np
-    from http import client
-    from urllib import parse
-    from tqdm import tqdm
-    from matplotlib import pyplot as plt
-    from plotly import express as px
     
-#     api_token = "1XOrWumzd3Lw99zn156obKbYmWS9wtVw4FX4LiuS"
-#     conn = client.HTTPSConnection('api.thenewsapi.com')
-#     elements = ["title", "description", "keywords", 
-#                 "url", "published_at", "source", "categories"]
-#     df = pd.DataFrame()
+    # settings of the TheNewsAPI
+    api_token = "1XOrWumzd3Lw99zn156obKbYmWS9wtVw4FX4LiuS"
+    conn = client.HTTPSConnection('api.thenewsapi.com')
+    elements = ["title", "description", "keywords", 
+                "url", "published_at", "source", "categories"] # columns of the dataset
+    df = pd.DataFrame()
 
-#     # use page = 1 to get the total number of news first
-#     trial = get_news("Starbucks", "2023-11-15", 1, api_token, conn) 
-#     trial_data = trial.retrieve_raw_data()
-#     news_number = int(trial_data[0]["meta"]['found'])
-#     pages = news_number // 25
-#     if news_number % 25 != 0:
-#         pages += 1
+    # use page = 1 to get the total number of news first
+    trial = get_news("Starbucks", "2023-11-15", 1, api_token, conn) # initialize the class object
+    trial_data = trial.retrieve_raw_data() 
+    news_number = int(trial_data[0]["meta"]['found']) # number of news articles
     
-#     starbucks = get_news("Starbucks", "2023-11-15", pages, api_token, conn)
-#     starbucks_data = starbucks.retrieve_raw_data()
+    # Each page contains 25 news articles, we want to calculate the total pages we have
+    # so that we can loop through the number of pages.
+    pages = news_number // 25 
+    if news_number % 25 != 0:
+        pages += 1
+    
+    # now we know the number of pages, we call another class object with this number
+    starbucks = get_news("Starbucks", "2023-11-15", pages, api_token, conn)
+    starbucks_data = starbucks.retrieve_raw_data()
+    
+    # create df columns, each column contains values of corresponding feature of news articles
+    # for example, the column named title contains titles of news articles. 
+    for x in elements:
+        ele = starbucks.element(starbucks_data, x)
+        df[x] = ele
+    
+    clean_df = starbucks.clean(df) # clean the dataframe
+    clean_df.to_csv("Starbucks_news.csv") # export to this .csv file.
 
-#     for x in tqdm(elements):
-#         ele = starbucks.element(starbucks_data, x)
-#         df[x] = ele
-    
-#     clean_df = starbucks.clean(df)
-#     starbucks.understand_data(clean_df)
-#     clean_df.to_csv("Starbucks_news.csv")
 
-#   if you want to work on a new company, comment the code below and un-comment the code above.
     
-    # if you want to simply visualize the data for starbucks, do:
+# if you want to simply visualize the data for starbucks, do:
     df = pd.read_csv("Starbucks_news.csv")
     starbucks = get_news()
     starbucks.understand_data(df)

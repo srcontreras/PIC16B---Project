@@ -1,25 +1,67 @@
-class stock_price_visualization:
-    def __init__(self, code = None, start = "2021-01-04"):
+import pandas as pd
+import numpy as np
+from yahoo_fin import stock_info as si
+from matplotlib import pyplot as plt
+from plotly import express as px
+
+class stockprice:
+    '''
+    This class is for interacting with the dataset of stock price of Starbucks, including collecting the data,
+    visualizing the data, and adding new features to the new data. The data is the general stock price of 
+    Starbucks ranging from 2021-01-04 to 2023-11-14, including volume, open, close, high, low and so on. 
+    Package yahoo_fin is used.
+    
+    Attributes:
+    ----------
+    code: str, the ticker symbol of a company; default is sbux, stands for Starbucks;
+    start: str, start date of the stock price; default is 2021-01-04;
+    end: str, end date of the stock price; default is 2023-11-14.
+    
+    Methods:
+    -------
+    create_data(): create the stock price dataset with the given restriction;
+    stock_price_change(data): visualize the daily price change of stock price;
+    stock_price_percentage(data): visualize the daily percentage price change of stock price;
+    (some others could be added)
+    '''
+    
+    def __init__(self, code = 'sbux', start = "2021-01-04", end = "2023-11-14"):
         '''
-        code: company name
-        start: start date, note that it has to be valid after 2021
+        @param code: str, ticker symbol of company, default is sbux;
+        @param start: str, start date of the stock price, default is 2021-01-03;
+        @param end: str, end date of the stock price, default is 2023-11-14
         '''
         
         self.code = code
         self.start = start
+        self.end = end
         
     def create_data(self):
+        '''
+        This method creates the stock price dataset with code, start, end specified in the constructor function.
+        No input parameters are required. We use a package called yahoo_fin to retrieve data. 
+        
+        @rvalue: dataframe, the return value is the pandas dataframe that contains the desired stock price. 
+        '''
+        
         company = si.get_data(self.code)
-        company = company.loc[self.start:] # 01-04 is the first Monday of 2021.
-        company["date"] = company.index
-        company = company.reset_index()
+        company = company.loc[self.start:self.end] 
+        company["date"] = company.index # create a data column
+        company = company.reset_index() # reset_index so that index starts from 0
         company.drop(columns = "index", inplace = True)
         
         return company
     
     def stock_price_change(self, data):
-    
-        # we will focus on close price
+        '''
+        This method creates a plot that visualizes the daily stock changes in real terms. Close price of Starbucks
+        is considered, but not open price, as the former is more representative.
+        
+        @param data: dataframe, the dataset we get from method create_data()
+        
+        The method has no return values, but plot a figure to present daily stock changes.
+        '''
+
         fig = px.line(data, 
                       x = "date",
                       y = "close",
@@ -32,8 +74,18 @@ class stock_price_visualization:
         fig.show()
         
     def stock_price_percentage(self, data):
-        data["yesterday"] = data["close"].shift(1)
-        data = data.fillna(data["close"][0])
+        '''
+        This method creates a plot that visualizes the daily stock changes in percentage terms. 
+        Again, close price of Starbucks is considered.
+        
+        @param data: dataframe, the dataset we get from method create_data()
+        
+        The method has no return values, but plot a figure to present daily percentage stock changes.
+        '''
+        
+        # percentage change satisfies (today - yesterday) / yesterday
+        data["yesterday"] = data["close"].shift(1) # shift the column downward by 1 row
+        data = data.fillna(data["close"][0]) # fill nan with the first entry of close
         data["%change"] = (data["close"]- data["yesterday"]) / data["yesterday"]
         avg = np.mean(data["%change"])
 
