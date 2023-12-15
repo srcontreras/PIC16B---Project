@@ -98,7 +98,9 @@ def clean_data(data):
 
     The function returns data without NA values.
     '''
-    return data.dropna(ignore_index = True)
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+    return data
 
 def add_features(data):
     '''
