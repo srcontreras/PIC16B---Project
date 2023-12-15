@@ -98,7 +98,9 @@ def clean_data(data):
 
     The function returns data without NA values.
     '''
-    return data.dropna(ignore_index = True)
+    data.dropna(inplace=True)
+    data.reset_index(drop=True, inplace=True)
+    return data
 
 def add_features(data):
     '''
@@ -354,8 +356,8 @@ def run_model(stock_df, sentiment_df = None, features = None):
     # create model
     model = Sequential()
     output_shape = x_train.shape[1] * x_train.shape[2]
-    model.add(LSTM(n_neurons, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2]))) 
-    model.add(LSTM(n_neurons, return_sequences=False))
+    model.add(LSTM(output_shape, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2]))) 
+    model.add(LSTM(output_shape, return_sequences=False))
     model.add(Dense(final_dense))
     model.add(Dense(1))
     
