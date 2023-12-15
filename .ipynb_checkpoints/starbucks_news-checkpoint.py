@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from http import client
 from urllib import parse
-from tqdm import tqdm
 from matplotlib import pyplot as plt
 from plotly import express as px
 
@@ -20,14 +19,33 @@ class get_news:
     TheNewsAPI is used for data collection. Data cleaning and visualization are also implemented in this class.
     As notified, the API is not free, so re-running is not recommended. To see how to retrieve data from this 
     API, see the code in __main__() at the bottom.
-
+    
+    Attributes:
+    ----------
+    company_name: str, name of the company; we want our news article to focus on this company; default Starbucks;
+    end_date: str, the date of the latest news article that we incorporate; default 2023-11-14;
+    pages: int, the pages of news articles that are about to be retrieved; default None;
+    api_token: str, the api key for accessing the TheNewsAPI; default None;
+    conn: object, connector that allows us to access the API; default None.
+    
+    Methods:
+    -------
+    retrieve_raw_data(): collect all the pages that contain news article from 2021 up to 2023-11-14;
+    element(raw_data, objects): store the feature of each news article;
+    clean(df): clean the raw dataset;
+    understand_data(df): visualize the number of news articles each day.
     '''
+    
     def __init__(self, company_name = 'Starbucks', end_date = '2023-11-14', pages = None, 
                  api_token = None, conn = None):
+        '''
+        @param company_name: str, we only focus on news articles of this company; default Starbucks
+        @param end_date: str, we only consider news articles up to this date; default 2023-11-14
+        @param pages: int, the number of pages retrieved from the API; default None
+        @param api_token: str, the api key for accessing the API; default None
+        @param conn: object, the connector that allows to access the API; default None
+        '''
         
-        # company_name is the company we focus on
-        # end_date is the latest date of news we consider
-    
         self.company_name = company_name
         self.end_date = end_date
         self.pages = pages
@@ -35,9 +53,20 @@ class get_news:
         self.conn = conn
         
     def retrieve_raw_data(self):
-        news_list = []
+        '''
+        This method helps us collect news articles of Starbucks from the TheNewsAPI. We append each page
+        from the API to a list, and use it as our raw data for future processes. No parameter is required:
+        all necessary ones are defined in the constructor.
         
+        @rvalue: list, the return value is a list that contains all pages of news articles of Starbucks. 
+        '''
+        
+        news_list = [] # place to store raw data
+        
+        # append each page to the list
         for i in range(1, self.pages + 1):
+            
+            #general settings of accessing the API
             params = parse.urlencode({"api_token": self.api_token,
                                              "search": self.company_name,
                                              "search_fields": "description,title,keywords",
@@ -45,45 +74,74 @@ class get_news:
                                              "published_before": self.end_date,
                                              "page": i,
                                              "limit": 25})
-            self.conn.request("GET", "/v1/news/all?{}".format(params))
+            self.conn.request("GET", "/v1/news/all?{}".format(params)) # connect to the API
             response = self.conn.getresponse()
             data = response.read()
-            info = data.decode("utf-8") # information of each news article
-            json_info = json.loads(info)
+            info = data.decode("utf-8") # information of each page of Starbucks news article
+            json_info = json.loads(info) # the info is json format, we transform it into Python dict
             
             news_list.append(json_info)
         
         return news_list
     
-    def element(self, raw_data, objects):
-        elements = []
+    def element(self, raw_data, feature):
+        '''
+        This method collects details (features) of the news article from the raw data we get from 
+        retrieve_raw_data() method. To be specific, we consider 7 features: 
+        "title", "description", "keywords", "url", "published_at", "source", and "categories". 
+        This method focuses on one of them and find the corresponding feature in the raw data, 
+        extract it and save it into a list. To cover all the 7 features, we will use a for loop in the main scope.
         
+        @param raw_data: list, the raw data that contains all pages of the news articles;
+        @feature: str, one of the 7 features listed above.
+        
+        @rvalue: list, the return value is a list that contains the corresponding feature of each news article
+                 in the raw data.
+        '''
+        
+        elements = [] # place to store the feature of all news articles
+        
+        # loop over each page
         for i in raw_data:
-            each_data = i["data"]
-            for j in each_data:
-                elements.append(j[objects])
+            each_data = i["data"] # the news articles of one page are stored as value of key 'data'
+            for j in each_data: # loop through each news articles
+                elements.append(j[feature]) # extract the corresponding feature
         
         return elements 
     
     def clean(self, df):
-        df["date"] = df["published_at"].str[:10]
-        df["where"] = df["source"].str.split(".").str[:-1].str.join(" ")
-        df = df.sort_values(by = "date").reset_index()
+        '''
+        This method cleans the dataframe of Starbucks news articles, such as truncate the publish date of 
+        each article, clean the source, and sort the dataframe based on publish date, from oldest to latest.
+        
+        @param df: dataframe, each column of the dataframe is one feature of the news article, which is returned
+                   by the element(raw_data, feature) method. 
+        
+        @rvalue: dataframe, which is the cleaned version of the original df.
+        '''
+        
+        df["date"] = df["published_at"].str[:10] # Year-Month-Date
+        df["where"] = df["source"].str.split(".").str[:-1].str.join(" ") # clean source
+        df = df.sort_values(by = "date").reset_index() # sort from oldest to latest news articles
         df.drop(columns = ["published_at", "source", "index"], inplace = True)
         
         return df
     
     def understand_data(self, df):
         '''
-        to run visualization, do the following:
-        object = get_news()
-        fig = object.understand_data(data)
-        fig
+        This method visualizes the number of news articles on each day, along with the median of number of each year.
+        This can help understand the distribution of our data, which can be used to make inference of the 
+        performance of prediction later. 
+        
+        @param df: dataframe, the cleaned version of dataset, returned by clean(df).
+        
+        No return value, but show the plot.
         '''
-        yearly_info = df.groupby("date").apply(len).reset_index()
+        
+        yearly_info = df.groupby("date").apply(len).reset_index() # number of news on each day
         yearly_info = yearly_info.rename(columns = {0: "news_each_day"})
-        yearly_info["year"] = yearly_info["date"].str.split("-").str[0]
-        yearly_info["days"] = yearly_info.groupby("year")["year"].transform(len)
+        yearly_info["year"] = yearly_info["date"].str.split("-").str[0] # get year
+        yearly_info["days"] = yearly_info.groupby("year")["year"].transform(len) 
         yearly_info["median"] = round(yearly_info.groupby("year")["news_each_day"].transform(np.median))
     
     
@@ -134,9 +192,9 @@ if __name__ == "__main__":
     clean_df = starbucks.clean(df) # clean the dataframe
     clean_df.to_csv("Starbucks_news.csv") # export to this .csv file.
 
-
+#***************************************************************************#
     
-# if you want to simply visualize the data for starbucks, do:
+# we've already retrieved and saved the news article; it's recommended to read the .csv file directly:
     df = pd.read_csv("Starbucks_news.csv")
     starbucks = get_news()
     starbucks.understand_data(df)
