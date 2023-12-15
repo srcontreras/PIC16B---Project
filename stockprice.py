@@ -109,11 +109,6 @@ class stockprice:
 
 
 if __name__ == "__main__":
-    import pandas as pd
-    import numpy as np
-    from yahoo_fin import stock_info as si
-    from matplotlib import pyplot as plt
-    from plotly import express as px
     
     stock = stock_price_visualization("sbux")
     data = stock.create_data()
