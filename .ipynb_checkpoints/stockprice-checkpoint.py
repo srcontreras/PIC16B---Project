@@ -27,8 +27,8 @@ def create_data(code = "SBUX", start = "2021-01-04", end = "2023-11-14"):
     @rvalue: dataframe, the return value is the pandas dataframe that contains the desired stock price. 
     '''
     
-    company = si.get_data(self.code)
-    company = company.loc[self.start:self.end] 
+    company = si.get_data(code)
+    company = company.loc[start:end] 
     company["date"] = company.index # create a data column
     company = company.reset_index() # reset_index so that index starts from 0
     company.drop(columns = "index", inplace = True)
