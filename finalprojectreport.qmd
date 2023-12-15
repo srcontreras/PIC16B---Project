@@ -1,0 +1,52 @@
+---
+title: "A Sentiment Analysis Approach to Stock Price Prediction"
+author: "Sarah Contreras, Yujun Song, Ken Isaka"
+date: "2023-12-15"
+categories: [Fall Quarter 2023]
+---
+
+The Efficient Market Hypothesis is one of the most commonly held beliefs in the financial industry. It implies that stocks always trade at their fair value on exchanges, making it impossible for investors to purchase undervalued stocks or sell stocks for inflated prices. However, over time with investors such as Warren Buffet making billions off stock predictions, many have followed suit to try to develop successful prediction models. In our project, we attempt to utilize the impact of news articles to predict stock price behavior successfully. 
+
+## Methodology
+
+
+```{dot}
+digraph ProjectLayout {
+
+    subgraph SentimentAnalysis {
+        style=filled;
+        color=lightgrey;
+        node [color=white];
+        News Collection -> Text Preprocessing -> Polarity Detection Algorithm -> Polarize New Data;
+        label = "Sentiment Analysis";
+    }
+
+    subgraph StockPriceModel {
+        node [style=filled];
+        Historical Stock Price Collection -> Train Stock Price Model;
+        label = "Stock Price Model";
+    }
+    Web Scraping -> News Collection;
+    Web Scraping -> Historical Stock Price Collection;
+    Polarize New Data -> Test stock model with sentiment;
+    Train Stock Price Model -> Test stock model with sentiment;
+    Test stock model with sentiment -> Evaluate Model Performance;
+
+
+}
+```
+![System Figure]
+
+Our project plan started off with collecting our data for our sentiment analysis and stock prediction model. We looked through various APIs such as X (formerly known as Twitter) and NewsData.io. We ended up using the Yahoo finance python module for historical stock price data and Good News Network for news articles related to businesses. We decided to focus our scope on one business, Starbucks, so that it would be easier to collect relevant news articles and stock price information. 
+
+With Good News Network as our data, we used the API to find negative news by searching keywords like "crime" and "fraud". We cleaned, labelled, and randomly shuffled them for training validation. We applied NLP to the articles, trained the model, and classified them into either "positive" (labeled as 1) or "negative" (laveled as 0). We take the labels for each article (as determined by the model) and add these to news article dataset we have for a given day. For articles on the same day, we average the labels to get a "public sentiment" towards the company on that day. We find the daily stock price and calculate the percntage change from the Yahoo finance package. We observe the linear relationship between the "public sentiment" and the "stock price" to see the efficiency of this factor. We then use "public sentiment" as an input and apply a neural network to predict the stock price change. 
+
+### Web Scraping
+
+One of our biggest problems at the beginning of the project was figuring out how we were going to find news articles about Starbucks. Our project idea initially was to see how Twitter (now known as X) affects stock prices; however, Twitter had just changed their API policies, limiting non-paying users to only 1000 tweets per month, which would be pretty much useless for us. We looked at other APIs such as NewsData.io, but they also required us to pay to get an API key. What we settled on was using Good News Network to use as positive news articles. We could also search Good News Network for articles specific to Starbucks 
+
+### Spec 2
+
+### Spec 3
+
+
