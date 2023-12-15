@@ -13,6 +13,7 @@ from ourProject.stockprice import split_data
 from ourProject.stockprice import compile_train
 from ourProject.stockprice import plot_history
 from ourProject.stockprice import evaluate_model
+from ourProject.stockprice import run_model
 from ourProject.TextDataPrep import prepData
 from ourProject.TextDataPrep import negative_aug
 from ourProject.TextDataPrep import remove_punc
