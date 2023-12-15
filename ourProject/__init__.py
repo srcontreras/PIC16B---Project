@@ -1,4 +1,22 @@
 from ourProject.starbucks_news import get_news
-from ourProject.ModelPred import TrainModel, pred_scores
-from ourProject.stockprice import create_data, stock_price_change, stock_price_percentage, clean_data, add_features, pred_target, scalers, train_val_test, split_data, compile_train, plot_history, evaluate_model
-from ourProject.TextDataPrep import prepData, negative_aug, remove_punc, get_wordnet_pos, lemma, make_dataset
+from ourProject.ModelPred import TrainModel
+from ourProject.ModelPred import pred_scores
+from ourProject.stockprice import create_data
+from ourProject.stockprice import stock_price_change
+from ourProject.stockprice import stock_price_percentage
+from ourProject.stockprice import clean_data
+from ourProject.stockprice import add_features
+from ourProject.stockprice import pred_target
+from ourProject.stockprice import scalers
+from ourProject.stockprice import train_val_test
+from ourProject.stockprice import split_data
+from ourProject.stockprice import compile_train
+from ourProject.stockprice import plot_history
+from ourProject.stockprice import evaluate_model
+from ourProject.TextDataPrep import prepData
+from ourProject.TextDataPrep import negative_aug
+from ourProject.TextDataPrep import remove_punc
+from ourProject.TextDataPrep import get_wordnet_pos
+from ourProject.TextDataPrep import lemma
+from ourProject.TextDataPrep import make_dataset
+
