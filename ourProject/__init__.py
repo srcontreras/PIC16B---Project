@@ -8,7 +8,8 @@ from ourProject.stockprice import clean_data
 from ourProject.stockprice import add_features
 from ourProject.stockprice import pred_target
 from ourProject.stockprice import scalers
-from ourProject.stockprice import train_val_test, split_data,
+from ourProject.stockprice import train_val_test
+from ourProject.stockprice import split_data
 from ourProject.stockprice import compile_train
 from ourProject.stockprice import plot_history
 from ourProject.stockprice import evaluate_model
