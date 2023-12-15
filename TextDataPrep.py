@@ -95,14 +95,29 @@ def negative_aug(df):
 
 def remove_punc(input_data):
     '''
-    This function removes the punctuation in the text
+    This function removes the punctuation in the text. This will be used in the TextVectorization layer of the model.
+    
+    @param input_data: tf str, the text data of our dataset.
+    
+    @rvalue: tf str, the text after removing punctuations.
     '''
+    
     no_punctuation = tf.strings.regex_replace(input_data,
                                              '[%s]' % re.escape(string.punctuation),'')
     return no_punctuation
 
-# Function to convert NLTK's POS tags to WordNet's format
+
 def get_wordnet_pos(treebank_tag):
+    '''
+    This function converts a Penn Treebank part-of-speech tag to a WordNet POS tag.
+    This is part of the function defined next. 
+    
+    @param treebank_tag: str, a part of speech tag in Penn Treebank format.
+    
+    @rvalues: str or None, the corresponding WordNet part-of-speech tag (one of ADJ, VERB, NOUN, ADV),
+                           or None if the treebank tag doesn't satisfy some conditions.
+    '''
+    
     if treebank_tag.startswith('J'):
         return wordnet.ADJ
     elif treebank_tag.startswith('V'):
@@ -115,7 +130,17 @@ def get_wordnet_pos(treebank_tag):
         return None
 
 def lemma(x):
-    # Lemmatizer
+    '''
+    Lemmatize a sentence using NLTK's WordNetLemmatizer, converting each word to its base or dictionary form.
+    This function tokenizes the input sentence, assigns part-of-speech tags, and then lemmatizes each word
+    based on its POS tag. If a POS tag is not recognized, it defaults to NOUN.
+    This function will be used with .apply() method.
+
+    @param x: str, sentence in string format to be lemmatized.
+    
+    @rvalues: str, the lemmatized sentence, with each word in its base form.
+    '''
+    
     lemmatizer = WordNetLemmatizer()
     tokens = word_tokenize(x)
     tagged = nltk.pos_tag(tokens)
@@ -125,10 +150,19 @@ def lemma(x):
         wordnet_pos = get_wordnet_pos(tag) or wordnet.NOUN
         lemmatized_sentence.append(lemmatizer.lemmatize(word, pos=wordnet_pos))
         
-    return ' '.join(lemmatized_sentence)
+    return ' '.join(lemmatized_sentence) # return lemmatized sentence of each entry of dataframe.
 
 
 def make_dataset(df):
+    '''
+    This function transforms a pandas dataframe into a tensorflow dataset, with all the cleaning processes
+    we defined above. 
+    
+    @param df: dataframe, contains the news article
+    
+    @rvalues: tensorflow dataset, contains clean text data.
+    '''
+    
     stop = stopwords.words("english")
     
     # change into lower case first
@@ -137,7 +171,7 @@ def make_dataset(df):
     # remove stopwords
     df['cleaned'] = df['cleaned'].apply(lambda x: ' '.join([word for word in x.split() if word not in stop]))
     
-    # stemming
+    # stemming/lemmatizing
     df['cleaned'] = df['cleaned'].apply(lambda x: lemma(x))
     
     data = tf.data.Dataset.from_tensor_slices((df['cleaned'], df['Category']))
