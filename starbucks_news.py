@@ -144,7 +144,7 @@ class get_news:
         yearly_info["days"] = yearly_info.groupby("year")["year"].transform(len) 
         yearly_info["median"] = round(yearly_info.groupby("year")["news_each_day"].transform(np.median))
     
-    
+        # plot figure
         fig = px.scatter(yearly_info,
                          x = "date",
                          y = "news_each_day",

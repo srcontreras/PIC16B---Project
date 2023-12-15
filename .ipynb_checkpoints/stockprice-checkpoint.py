@@ -347,11 +347,6 @@ def evaluate_model(model, x_test, y_test, scaler_target):
     print(f'Median Absolute Percentage Error (MDAPE): {np.round(MDAPE, 2)} %')
 
 if __name__ == "__main__":
-    import pandas as pd
-    import numpy as np
-    from yahoo_fin import stock_info as si
-    from matplotlib import pyplot as plt
-    from plotly import express as px
     
     stock = stockprice()
     data = stock.create_data()
