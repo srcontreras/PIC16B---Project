@@ -16,7 +16,7 @@ class GoodNews(scrapy.Spider):
                      the current page.
     parse_title_content(response): parse the title and content on one page.
     '''
-    name = 'goodnews' # name of unique spider
+    name = 'goodnews' # name of unique spider, very important
     
     # begin with searching up business in goodnewsnetwork website
     start_urls = ['https://www.goodnewsnetwork.org/?s=business']
