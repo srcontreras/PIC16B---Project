@@ -21,7 +21,7 @@ def create_data(code = "SBUX", start = "2021-01-04", end = "2023-11-14"):
     We use a package called yahoo_fin to retrieve data. 
     
     @param code: str, ticker symbol of company, default is sbux;
-    @param start: str, start date of the stock price, default is 2021-01-03;
+    @param start: str, start date of the stock price, default is 2021-01-04;
     @param end: str, end date of the stock price, default is 2023-11-14.
     
     @rvalue: dataframe, the return value is the pandas dataframe that contains the desired stock price. 
@@ -200,8 +200,8 @@ def split_data(seq_len, data, index_close):
     @index_close (int): index of the column containing the target variable (closing prices)
 
     The function returns:
-    x: input sequences each of shape (seq_len, num_features)
-    y: corresponding output values, representing the target variable for single-step prediction
+    x: input sequences each of shape (length of data, seq_len, num_features)
+    y: corresponding output values of shape (seq_len, ), representing the target variable for single-step prediction
     '''
     x, y = [], []
     data_len = data.shape[0]
@@ -320,7 +320,53 @@ def evaluate_model(model, x_test, y_test, scaler_target):
     MDAPE = np.median((np.abs(np.subtract(y_true_close, y_predicted_close) / y_true_close))) * 100
     print(f'Median Absolute Percentage Error (MDAPE): {np.round(MDAPE, 2)} %')
 
+def run_model(stock_df, sentiment_df = None, features = None):
+    '''
+    This function run the stock price prediction model utilizing the functions we defined above. It will create training, 
+    validation, and testing datasets, will normalize the data, and create a Sequential model using Long Short Term Memory and
+    Dense layers. If a sentiment_df is provided, the function will create a model using sentiment to predict stock prices.
 
+    @param stock_df: dataframe containing stock information from 2021-01-04 to 2023-11-14
+    @param sentiment_df: dataframe containing predicted sentiment scores of starbucks news from 2021-01-04 to 2023-11-14
+    @param features (str): list of strings with names of predictor variables to take into account when creating model
+
+    The function does not return anything and instead plots the predicted and actual closing stock prices and prints out the three metrics. 
+    '''
+    if sentiment_df is not None:
+        # add sentiment scores (if available) to stock data
+        sentiment_col = sentiment_df["Score"]
+        stock_df["sentiment"] = sentiment_col.tolist()
+    stock_df = clean_data(stock_df) # clean data
+    stock_df = add_features(stock_df) # add features
+    df_feat_pred, df_close_target = pred_target(features, stock_df) # predictor and target data
+    # normalize data
+    scaler_pred, scaler_target, scaled_pred, scaled_target = scalers(df_feat_pred, df_close_target)
+    seq_len = 50 # number of previous time steps to predict closing price
+    index_close = df_feat_pred.columns.get_loc("close") # int defining index of close column
+    # split into training, validation, and testing datasets
+    train_data, val_data, test_data = train_val_test(df_feat_pred, seq_len, scaled_p = scaled_pred)
+    # split into predictor and target values
+    x_train, y_train = split_data(seq_len, train_data, index_close)
+    x_val, y_val = split_data(seq_len, val_data, index_close)
+    x_test, y_test = split_data(seq_len, test_data, index_close)
+    final_dense = len(features) # define output for dense layer
+    
+    # create model
+    model = Sequential()
+    output_shape = x_train.shape[1] * x_train.shape[2]
+    model.add(LSTM(n_neurons, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2]))) 
+    model.add(LSTM(n_neurons, return_sequences=False))
+    model.add(Dense(final_dense))
+    model.add(Dense(1))
+    
+    # compile and train model
+    history = compile_train(model, x_train, y_train, x_val, y_val)
+    # plot model loss for each epoch
+    plot_history(history)
+    # plot predicted vs true closing prices and output three different metrics
+    evaluate_model(model, x_test, y_test, scaler_target)
+        
+    
 
 
 
