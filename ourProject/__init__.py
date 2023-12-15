@@ -14,9 +14,9 @@ from ourProject.stockprice import compile_train
 from ourProject.stockprice import plot_history
 from ourProject.stockprice import evaluate_model
 from ourProject.TextDataPrep import prepData
-from ourProject.stockprice import negative_aug
-from ourProject.stockprice import remove_punc
-from ourProject.stockprice import get_wordnet_pos
-from ourProject.stockprice import lemma
-from ourProject.stockprice import make_dataset
+from ourProject.TextDataPrep import negative_aug
+from ourProject.TextDataPrep import remove_punc
+from ourProject.TextDataPrep import get_wordnet_pos
+from ourProject.TextDataPrep import lemma
+from ourProject.TextDataPrep import make_dataset
 
