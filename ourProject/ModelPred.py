@@ -119,7 +119,7 @@ def pred_scores(model, real, starbucks, check = False):
     if check: # check accuracy of prediction
         sentiment = starbucks[:5][["title", "score1"]]
         for i in range(5):
-            print('"', sentiment.iloc[i]["title"], '"' , "scores: ", check.iloc[i]["score1"])
+            print('"', sentiment.iloc[i]["title"], '"' , "scores: ", sentiment.iloc[i]["score1"])
             print('\n')
     
     pred = starbucks[["date", "score1"]]
