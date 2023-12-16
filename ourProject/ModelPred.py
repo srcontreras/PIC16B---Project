@@ -125,8 +125,6 @@ def pred_scores(model, real, starbucks, check = False):
     pred = starbucks[["date", "score1"]]
     pred = pred.groupby("date").apply(np.mean) # calculate average sentiment score on each day
     pred = pred.reset_index()
-    print(pred.head(5))
-    pred.rename(columns = {0: "score"}, inplace = True)
 
     company = si.get_data('sbux') # get stock information
     company = company.loc["2021-01-04":] 
@@ -141,7 +139,7 @@ def pred_scores(model, real, starbucks, check = False):
     # because date for stock price and date for news articles are not aligned, we need to work on this
     date1 = date['date'].to_numpy()
     date2 = pred["date"].to_numpy()
-    score = pred["score"].to_numpy()
+    score = pred["score1"].to_numpy()
     
     score_pred = []
     memory = 0
