@@ -44,12 +44,12 @@ def prepData(fin_data, positive, print_size = False):
     title = merge[['title', 'Sentiment']]
     title.rename(columns = {'title': 'Sentence'}, inplace = True)
     data = pd.concat([fin_data, title], axis = 0) # concatenate 2 tables
-    data = data_t.reset_index()
+    data = data.reset_index()
     data.drop(columns = 'index', inplace = True)
     data = data.sample(frac=1)
     
     if print_size:
-        print(data_t.groupby("Sentiment").apply(len))
+        print(data.groupby("Sentiment").apply(len))
     
     return data
 
@@ -76,7 +76,7 @@ def negative_aug(df):
     aug2 = naw.ContextualWordEmbsAug(model_path='distilbert-base-uncased', action="substitute")
     aug3 = naw.ContextualWordEmbsAug(model_path='roberta-base', action="substitute")
     
-    negative = data_t[data_t["Sentiment"] == "negative"] # all negative sentences
+    negative = df[df["Sentiment"] == "negative"] # all negative sentences
     
     negative_aug1 = negative["Sentence"].apply(aug1.augment) # apply augmentation
     negative_aug2 = negative["Sentence"].apply(aug2.augment) 
@@ -174,6 +174,6 @@ def make_dataset(df):
     # stemming/lemmatizing
     df['cleaned'] = df['cleaned'].apply(lambda x: lemma(x))
     
-    data = tf.data.Dataset.from_tensor_slices((df['cleaned'], df['Category']))
+    data = tf.data.Dataset.from_tensor_slices((df['cleaned'], df['Sentiment']))
     
     return data
