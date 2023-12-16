@@ -368,7 +368,7 @@ def run_model(stock_df, sentiment_df = None, features = None):
     # plot predicted vs true closing prices and output three different metrics
     # evaluate_model(model, x_test, y_test, scaler_target)
         
-    return model, x_test, y_test, scarler_target
+    return model, x_test, y_test, scaler_target
     
 
 
