@@ -13,7 +13,8 @@ from yahoo_fin import stock_info as si
 def TrainModel(df, starbucks, make_dataset, remove_punc):
     '''
     This function trains the model on the textual dataframe we have. The function will return the model
-    so that it could be used for prediction on the Starbucks news dataframe for sentiment analysis.
+    so that it could be used for prediction on the Starbucks news dataframe for sentiment analysis. 
+    It will also return the prediction dataset 
     
     @param df: dataframe, the train data we have which will be used to create Tensor's dataset;
     @param starbucks: dataframe, contains news articles of Starbucks; we create the tensor's dataset for
@@ -21,11 +22,12 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     @param make_dataset: func, function for creating Tensor's dataset, defined in TextDataPrep.py;
     @param remove_punc: func, function for removing punctuations, defined in TextDataPrep.py.
     
-    @rvalue: model after training, which will be used for prediction.
+    @rvalue: model after training, which will be used for prediction;
+             the prediction dataset we will use for prediction
     '''
     
     le = LabelEncoder() # label the sentiment, 0: negative, 1: neutral, 2: positive
-    df['Category'] = le.fit_transform(df['Sentiment'])
+    df['Sentiment'] = le.fit_transform(df['Sentiment'])
     
     dataset = make_dataset(df) # make tensor dataset
     dataset = dataset.shuffle(buffer_size = len(dataset), reshuffle_each_iteration=False)
@@ -39,7 +41,7 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     # creating starbucks dataset
     title = pd.DataFrame(starbucks['title'])
     title.rename(columns = {'title': "Sentence"}, inplace = True)
-    title["Category"] = 0 # add one column for the purpose of text vectorization layer
+    title["Sentiment"] = 0 # add one column for the purpose of text vectorization layer
     title = make_dataset(title)
     
     max_tokens = 3000
