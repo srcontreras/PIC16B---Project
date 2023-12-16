@@ -366,17 +366,16 @@ def run_model(stock_df, sentiment_df = None, features = None):
     # plot model loss for each epoch
     plot_history(history)
     # plot predicted vs true closing prices and output three different metrics
-<<<<<<< Updated upstream
-    evaluate_model(model, x_test, y_test, scaler_target)
-=======
-<<<<<<< HEAD
     
     # evaluate_model(model, x_test, y_test, scaler_target)
         
-=======
-    evaluate_model(model, x_test, y_test, scaler_target)
->>>>>>> 4338e0091b1c61f93541986f6724f394ad6fb71c
->>>>>>> Stashed changes
     return model, x_test, y_test, scaler_target
+    
+
+
+
+
+
+
 
 
