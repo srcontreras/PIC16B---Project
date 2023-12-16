@@ -146,7 +146,7 @@ def pred_scores(model, real, starbucks, check = False):
     count = 0
 
     for i in range(len(score)):
-        if i < len(data1) and date1[i] not in date2: # if on this day, we have stock price but no news article
+        if i < len(date1) and date1[i] not in date2: # if on this day, we have stock price but no news article
             score_pred.append(1) # we deem it as neutral
             continue
             
