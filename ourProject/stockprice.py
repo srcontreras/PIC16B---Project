@@ -271,7 +271,7 @@ def plot_history(history):
     )
 
     # show figure
-    return fig
+    fig.show()
     
 def evaluate_model(model, x_test, y_test, scaler_target):
     '''
@@ -321,7 +321,6 @@ def evaluate_model(model, x_test, y_test, scaler_target):
     # Median Absolute Percentage Error (MDAPE)
     MDAPE = np.median((np.abs(np.subtract(y_true_close, y_predicted_close) / y_true_close))) * 100
     print(f'Median Absolute Percentage Error (MDAPE): {np.round(MDAPE, 2)} %')
-    return fig
 
 def run_model(stock_df, sentiment_df = None, features = None):
     '''
@@ -365,9 +364,17 @@ def run_model(stock_df, sentiment_df = None, features = None):
     # compile and train model
     history = compile_train(model, x_train, y_train, x_val, y_val)
     # plot model loss for each epoch
-    fig1 = plot_history(history)
+    plot_history(history)
     # plot predicted vs true closing prices and output three different metrics
-    fig2 = evaluate_model(model, x_test, y_test, scaler_target)
-    return fig1, fig2
+    # evaluate_model(model, x_test, y_test, scaler_target)
+        
+    return model, x_test, y_test, scaler_target
+    
+
+
+
+
+
+
 
 

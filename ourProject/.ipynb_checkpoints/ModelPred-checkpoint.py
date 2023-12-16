@@ -13,7 +13,8 @@ from yahoo_fin import stock_info as si
 def TrainModel(df, starbucks, make_dataset, remove_punc):
     '''
     This function trains the model on the textual dataframe we have. The function will return the model
-    so that it could be used for prediction on the Starbucks news dataframe for sentiment analysis.
+    so that it could be used for prediction on the Starbucks news dataframe for sentiment analysis. 
+    It will also return the prediction dataset 
     
     @param df: dataframe, the train data we have which will be used to create Tensor's dataset;
     @param starbucks: dataframe, contains news articles of Starbucks; we create the tensor's dataset for
@@ -21,11 +22,12 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     @param make_dataset: func, function for creating Tensor's dataset, defined in TextDataPrep.py;
     @param remove_punc: func, function for removing punctuations, defined in TextDataPrep.py.
     
-    @rvalue: model after training, which will be used for prediction.
+    @rvalue: model after training, which will be used for prediction;
+             the prediction dataset we will use for prediction
     '''
     
     le = LabelEncoder() # label the sentiment, 0: negative, 1: neutral, 2: positive
-    df['Category'] = le.fit_transform(df['Sentiment'])
+    df['Sentiment'] = le.fit_transform(df['Sentiment'])
     
     dataset = make_dataset(df) # make tensor dataset
     dataset = dataset.shuffle(buffer_size = len(dataset), reshuffle_each_iteration=False)
@@ -39,7 +41,7 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     # creating starbucks dataset
     title = pd.DataFrame(starbucks['title'])
     title.rename(columns = {'title': "Sentence"}, inplace = True)
-    title["Category"] = 0 # add one column for the purpose of text vectorization layer
+    title["Sentiment"] = 0 # add one column for the purpose of text vectorization layer
     title = make_dataset(title)
     
     max_tokens = 3000
@@ -54,8 +56,8 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     
     def vectorize_text(text, label):
         '''
-        This function helps vectorize the test, train and validation set, which will be used in the function
-        defined below.
+        This function helps vectorize the test, train, validation and prediction set, 
+        which will be used in the function code below.
     
         @param text: str, the text that needs to be vectorized;
         @label: int, no use, we include it because our dataset also includes "label", which is the sentiment.
@@ -117,28 +119,27 @@ def pred_scores(model, real, starbucks, check = False):
     if check: # check accuracy of prediction
         sentiment = starbucks[:5][["title", "score1"]]
         for i in range(5):
-            print('"', sentiment.iloc[i]["title"], '"' , "scores: ", check.iloc[i]["score1"])
+            print('"', sentiment.iloc[i]["title"], '"' , "scores: ", sentiment.iloc[i]["score1"])
             print('\n')
     
     pred = starbucks[["date", "score1"]]
     pred = pred.groupby("date").apply(np.mean) # calculate average sentiment score on each day
-    pred = pd.DataFrame(pred)
-    pred.rename(columns = {0: "score"}, inplace = True)
-    
+    pred = pred.reset_index()
+
     company = si.get_data('sbux') # get stock information
     company = company.loc["2021-01-04":] 
     company["date"] = company.index
     company = company.reset_index()
     company.drop(columns = "index", inplace = True)
     
-    date = date[date['date'] < "2023-11-15"]
+    date = company[company['date'] < "2023-11-15"]
     date = date['date'].dt.strftime('%Y-%m-%d') # transform time to string
     date = pd.DataFrame(date)
     
     # because date for stock price and date for news articles are not aligned, we need to work on this
     date1 = date['date'].to_numpy()
     date2 = pred["date"].to_numpy()
-    score = pred["score"].to_numpy()
+    score = pred["score1"].to_numpy()
     
     score_pred = []
     memory = 0
@@ -146,7 +147,8 @@ def pred_scores(model, real, starbucks, check = False):
 
     for i in range(len(score)):
         if i < len(date1) and date1[i] not in date2: # if on this day, we have stock price but no news article
-            score_pred.append(None)
+            score_pred.append(1) # we deem it as neutral
+            continue
             
         if date2[i] not in date1: # if on this day, we have news article but no stock price
             memory += score[i] # we calculate the average
@@ -162,16 +164,6 @@ def pred_scores(model, real, starbucks, check = False):
             indic = 0
             continue
     
-    score_pred.append(score[i]) # if on this day, we have both stock price and news articles
+        score_pred.append(score[i]) # if on this day, we have both stock price and news articles
     
-    # because we append None in the first case, we have to replace it
-    # we replace the None by an average  
-    for i in range(len(score_pred)):
-        if score_pred[i] is None:
-            for j in range(1, i):
-                if score_pred[i-j] is not None and score_pred[i+j] is not None:
-                    avg = (score_pred[i-j] + score_pred[i+j]) / 2
-                    score_pred[i] = avg
-                    break
-                    
     return score_pred
