@@ -76,7 +76,7 @@ def negative_aug(df):
     aug2 = naw.ContextualWordEmbsAug(model_path='distilbert-base-uncased', action="substitute")
     aug3 = naw.ContextualWordEmbsAug(model_path='roberta-base', action="substitute")
     
-    negative = data_t[data_t["Sentiment"] == "negative"] # all negative sentences
+    negative = df[df["Sentiment"] == "negative"] # all negative sentences
     
     negative_aug1 = negative["Sentence"].apply(aug1.augment) # apply augmentation
     negative_aug2 = negative["Sentence"].apply(aug2.augment) 
