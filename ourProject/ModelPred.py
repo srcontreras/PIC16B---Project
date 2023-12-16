@@ -147,7 +147,8 @@ def pred_scores(model, real, starbucks, check = False):
 
     for i in range(len(score)):
         if i < len(date1) and date1[i] not in date2: # if on this day, we have stock price but no news article
-            score_pred.append(None)
+            score_pred.append(1) # we deem it as neutral
+            continue
             
         if date2[i] not in date1: # if on this day, we have news article but no stock price
             memory += score[i] # we calculate the average
@@ -163,16 +164,6 @@ def pred_scores(model, real, starbucks, check = False):
             indic = 0
             continue
     
-    score_pred.append(score[i]) # if on this day, we have both stock price and news articles
+        score_pred.append(score[i]) # if on this day, we have both stock price and news articles
     
-    # because we append None in the first case, we have to replace it
-    # we replace the None by an average  
-    for i in range(len(score_pred)):
-        if score_pred[i] is None:
-            for j in range(1, i):
-                if score_pred[i-j] is not None and score_pred[i+j] is not None:
-                    avg = (score_pred[i-j] + score_pred[i+j]) / 2
-                    score_pred[i] = avg
-                    break
-                    
     return score_pred
