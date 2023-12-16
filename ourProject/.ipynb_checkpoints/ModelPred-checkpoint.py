@@ -56,8 +56,8 @@ def TrainModel(df, starbucks, make_dataset, remove_punc):
     
     def vectorize_text(text, label):
         '''
-        This function helps vectorize the test, train and validation set, which will be used in the function
-        defined below.
+        This function helps vectorize the test, train, validation and prediction set, 
+        which will be used in the function code below.
     
         @param text: str, the text that needs to be vectorized;
         @label: int, no use, we include it because our dataset also includes "label", which is the sentiment.
