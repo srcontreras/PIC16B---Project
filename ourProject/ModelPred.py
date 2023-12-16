@@ -133,7 +133,7 @@ def pred_scores(model, real, starbucks, check = False):
     company = company.reset_index()
     company.drop(columns = "index", inplace = True)
     
-    date = company[date['date'] < "2023-11-15"]
+    date = company[company['date'] < "2023-11-15"]
     date = date['date'].dt.strftime('%Y-%m-%d') # transform time to string
     date = pd.DataFrame(date)
     
