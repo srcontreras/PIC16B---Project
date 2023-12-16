@@ -1,4 +1,3 @@
-import ourProject
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -11,7 +10,7 @@ from matplotlib import pyplot as plt
 from yahoo_fin import stock_info as si
 
 
-def TrainModel(df, starbucks):
+def TrainModel(df, starbucks, make_dataset, remove_punc):
     '''
     This function trains the model on the textual dataframe we have. The function will return the model
     so that it could be used for prediction on the Starbucks news dataframe for sentiment analysis. 
@@ -30,7 +29,7 @@ def TrainModel(df, starbucks):
     le = LabelEncoder() # label the sentiment, 0: negative, 1: neutral, 2: positive
     df['Sentiment'] = le.fit_transform(df['Sentiment'])
     
-    dataset = ourProject.make_dataset(df) # make tensor dataset
+    dataset = make_dataset(df) # make tensor dataset
     dataset = dataset.shuffle(buffer_size = len(dataset), reshuffle_each_iteration=False)
     
     train_size = int(0.7*len(dataset)) 
@@ -43,13 +42,13 @@ def TrainModel(df, starbucks):
     title = pd.DataFrame(starbucks['title'])
     title.rename(columns = {'title': "Sentence"}, inplace = True)
     title["Sentiment"] = 0 # add one column for the purpose of text vectorization layer
-    title = ourProject.make_dataset(title)
+    title = make_dataset(title)
     
     max_tokens = 3000
     sequence_length = 50
     
     # text vectorization layer used for NPL later
-    vectorize_layer = TextVectorization(standardize=ourProject.remove_punc, 
+    vectorize_layer = TextVectorization(standardize=remove_punc, 
                                         max_tokens=max_tokens, # only consider this many words
                                         output_mode='int',
                                         output_sequence_length=sequence_length)
