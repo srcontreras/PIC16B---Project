@@ -174,6 +174,6 @@ def make_dataset(df):
     # stemming/lemmatizing
     df['cleaned'] = df['cleaned'].apply(lambda x: lemma(x))
     
-    data = tf.data.Dataset.from_tensor_slices((df['cleaned'], df['Category']))
+    data = tf.data.Dataset.from_tensor_slices((df['cleaned'], df['Sentiment']))
     
     return data
