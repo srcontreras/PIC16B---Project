@@ -366,15 +366,7 @@ def run_model(stock_df, sentiment_df = None, features = None):
     # plot model loss for each epoch
     plot_history(history)
     # plot predicted vs true closing prices and output three different metrics
-    # evaluate_model(model, x_test, y_test, scaler_target)
-        
+    evaluate_model(model, x_test, y_test, scaler_target)
     return model, x_test, y_test, scaler_target
-    
-
-
-
-
-
-
 
 
