@@ -124,7 +124,7 @@ def pred_scores(model, real, starbucks, check = False):
     
     pred = starbucks[["date", "score1"]]
     pred = pred.groupby("date").apply(np.mean) # calculate average sentiment score on each day
-    pred = pd.DataFrame(pred)
+    pred = pred.reset_index（）
     pred.rename(columns = {0: "score"}, inplace = True)
     
     company = si.get_data('sbux') # get stock information
