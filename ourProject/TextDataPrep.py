@@ -49,7 +49,7 @@ def prepData(fin_data, positive, print_size = False):
     data = data.sample(frac=1)
     
     if print_size:
-        print(data_t.groupby("Sentiment").apply(len))
+        print(data.groupby("Sentiment").apply(len))
     
     return data
 
