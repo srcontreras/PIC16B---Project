@@ -1,5 +1,5 @@
 # PIC16B---Project
-In this project, we studied the potential effect of sentiment on the stock price of Starbucks. We use news articles for sentiment analysis tast, and use the generated scores as input to the model on predicting stock price. We are satisfied with the result we achieved, and we hope you can enjoy our project as well.
+In this project, we studied the potential effect of sentiment on the stock price of Starbucks. We use news articles for sentiment analysis test, and use the generated scores as input to the model on predicting stock price. We are satisfied with the result we achieved, and we hope you can enjoy our project as well.
 
 It is highly recommended that you run everything in google colab. Our tutorial (final report) also has a thorough explanation of how to run our code in colab. Therefore, please run all the codes there, instead of running in your local device. 
 
